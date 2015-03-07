@@ -1,2 +1,2 @@
 # treasure-map
-A treasure map fizzbuzz
+A treasure map fizzbuzz.
