@@ -34,7 +34,7 @@ public class Solver {
                 .collect(Collectors.toCollection(() -> new HashSet<Position>(adventurers.size())));
 
         while (anyoneMoves(adventurers)) {
-            adventurers.forEach(adv -> act(adv, occuped, scene.getMap()));
+            adventurers.parallelStream().forEach(adv -> act(adv, occuped, scene.getMap()));
         }
     }
 
@@ -71,7 +71,7 @@ public class Solver {
     /**
      * The action of the adventurer.
      * 
-     * @param adv
+     * @param adventurer
      *            The adventurer we are computing
      * @param occuped
      *            The occupied tiles. It is used as parameter to removes the need of state in the solver and make it
@@ -79,22 +79,22 @@ public class Solver {
      * @param map
      *            The treasure map.
      */
-    private void act(Adventurer adv, Set<Position> occuped, TreasureMap map) {
-        final Position currentPosition = adv.getPosition();
+    private void act(Adventurer adventurer, Set<Position> occuped, TreasureMap map) {
+        final Position currentPosition = adventurer.getPosition();
         if (map.hasTreasure(currentPosition)) {
-            adv.addTreasure(map.collect(currentPosition));
+            adventurer.addTreasure(map.collect(currentPosition));
             return;
         }
 
-        final Action action = adv.getInstruction().next();
-        final Position nextPosition = action.positionOn(adv.getPosition(), adv.getOrientation());
-        final Orientation nextOrientation = action.orientationOn(adv.getOrientation());
-        adv.setOrientation(nextOrientation);
+        final Action action = adventurer.getInstruction().next();
+        final Position nextPosition = action.positionOn(adventurer.getPosition(), adventurer.getOrientation());
+        final Orientation nextOrientation = action.orientationOn(adventurer.getOrientation());
+        adventurer.setOrientation(nextOrientation);
 
         if (map.isValid(nextPosition) && !occuped.contains(nextPosition)) {
             occuped.remove(currentPosition);
             occuped.add(nextPosition);
-            adv.setPosition(nextPosition);
+            adventurer.setPosition(nextPosition);
         }
     }
 
